@@ -1,0 +1,62 @@
+name: Deploy to Server  # 工作流名称（可自定义）
+
+# 触发条件：当代码推送到 main 或 master 分支时执行部署
+on:
+  push:
+    branches: [ "main", "master" ]  # 根据你的默认分支调整
+
+# 任务：定义一个名为 deploy 的任务（可自定义名称）
+jobs:
+  deploy:
+    # 运行环境：使用最新的 Ubuntu 系统
+    runs-on: ubuntu-latest
+    
+    # 步骤 1：检出仓库代码到 GitHub Actions 虚拟机
+    - name: Checkout code
+      uses: actions/checkout@v4  # 官方提供的检出代码 Action
+    
+    # 步骤 2：设置 Python 环境（根据你的项目需求调整版本）
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'  # 替换为你项目使用的 Python 版本（如 3.9/3.11）
+    
+    # 步骤 3：安装项目依赖（从 requirements.txt 安装）
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip  # 升级 pip 到最新版
+        pip install -r requirements.txt     # 安装项目依赖（必须有这个文件！）
+    
+    # 步骤 4（可选）：打包项目文件（仅传输必要文件到服务器，提升效率）
+    - name: Package project
+      run: |
+        # 创建一个临时目录，仅包含需要部署的文件（排除虚拟环境、日志等无关文件）
+        mkdir -p deployment
+        cp -r app.py requirements.txt static/ .env deployment/  # 按需调整复制的文件/目录
+        # 注意：如果使用虚拟环境，这里不需要复制整个 venv，因为服务器会重新安装依赖
+    
+    # 步骤 5：将打包好的文件传输到服务器（需要服务器 SSH 权限）
+    - name: Upload files to server
+      uses: appleboy/scp-action@master  # 使用第三方 Action 实现 SCP 传输
+      with:
+        host: ${{ secrets.SERVER_IP }}       # 服务器公网 IP（从 Secrets 获取）
+        username: ${{ secrets.SERVER_USER }} # 服务器登录用户名（如 root/ubuntu）
+        key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH 私钥（从 Secrets 获取，用于免密登录）
+        source: "deployment/*"               # 本地要传输的文件路径（即步骤 4 打包的目录）
+        target: "/opt/exchange_rate/"        # 服务器目标路径（与之前 systemd 服务的 WorkingDirectory 一致）
+        strip_components: 1                  # 可选：移除 deployment 目录层级（直接上传文件到目标路径）
+    
+    # 步骤 6：重启服务器上的应用服务（让新代码生效）
+    - name: Restart application service
+      uses: appleboy/ssh-action@master  # 再次使用 SSH Action 执行远程命令
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          # 重新加载 systemd 服务配置（如果有修改过服务文件）
+          sudo systemctl daemon-reload
+          # 重启你的应用服务（名称与之前创建的 systemd 服务文件一致）
+          sudo systemctl restart exchange-rate.service
+          # 可选：查看服务状态（调试用）
+          sudo systemctl status exchange-rate.service --no-pager
