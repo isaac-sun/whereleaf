@@ -60,3 +60,4 @@ jobs:
           sudo systemctl restart exchange-rate.service
           # 可选：查看服务状态（调试用）
           sudo systemctl status exchange-rate.service --no-pager
+          
