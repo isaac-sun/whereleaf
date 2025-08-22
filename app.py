@@ -32,7 +32,7 @@ def send_email(rate, timestamp):
     msg["To"] = TO_EMAIL
 
     try:
-        with smtplib.SMTP_SSL("smtp.qq.com", 465) as server:
+        with smtplib.SMTP_SSL("smtp.yeah.net", 465) as server:
             server.login(FROM_EMAIL, SENDGRID_API_KEY)
             server.sendmail(FROM_EMAIL, TO_EMAIL, msg.as_string())
         print("邮件发送成功！")
@@ -40,6 +40,17 @@ def send_email(rate, timestamp):
         print(f"邮件发送失败：{e}")
 
 def job():
+     """
+     定期任务：获取汇率并发送邮件通知。
+     
+     该函数执行以下操作：
+     1. 调用 `fetch_exchange_rate` 获取当前汇率和时间戳。
+     2. 如果成功获取到汇率（`rate` 不为 `None`），则调用 `send_email` 发送包含汇率和时间戳的邮件通知。
+     
+     注意：
+     - 此函数通常作为定时任务运行。
+     - 依赖外部函数 `fetch_exchange_rate` 和 `send_email` 的实现。
+     """
     rate, timestamp = fetch_exchange_rate()
     if rate is not None:
         send_email(rate, timestamp)
