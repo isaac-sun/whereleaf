@@ -19,7 +19,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'  # 替换为你项目使用的 Python 版本（如 3.9/3.11）
+        python-version: '3.12.3'  # 替换为你项目使用的 Python 版本（如 3.9/3.11）
     
     # 步骤 3：安装项目依赖（从 requirements.txt 安装）
     - name: Install dependencies
