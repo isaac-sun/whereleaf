@@ -1,0 +1,25 @@
+# 基础工具库
+pip>=23.0  # 升级 pip 到最新版（可选，但推荐）
+setuptools>=68.0.0  # 包管理工具
+wheel>=0.41.2  # 打包工具
+
+# Web 框架（二选一）
+Flask==2.3.3  # 轻量级 Web 框架（推荐）
+# Django==4.2.7  # 全功能 Web 框架（如果用 Django 则取消注释）
+
+# 常用扩展（根据需求选择）
+Flask-Cors==4.0.0  # 解决跨域问题（如果前端分离）
+python-dotenv==1.0.0  # 加载 .env 环境变量（推荐）
+requests==2.31.0  # 发送 HTTP 请求（如调用第三方 API）
+gunicorn==21.2.0  # WSGI 服务器（Linux 部署推荐，替代 Flask 内置服务器）
+
+# 数据库相关（根据数据库类型选择）
+# SQLite（无需额外驱动，Python 内置）
+# MySQL（需要 mysqlclient）
+mysqlclient==2.1.1  # MySQL 驱动（需先安装系统依赖：sudo apt install libmysqlclient-dev）
+# PostgreSQL（需要 psycopg2-binary）
+# psycopg2-binary==2.9.7  # PostgreSQL 驱动（更易安装）
+
+# 其他工具（根据需求添加）
+pytz==2023.3  # 时区处理（如时间戳转换）
+python-dateutil==2.8.2  # 日期时间扩展
