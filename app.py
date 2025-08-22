@@ -51,16 +51,16 @@ def job():
      - 此函数通常作为定时任务运行。
      - 依赖外部函数 `fetch_exchange_rate` 和 `send_email` 的实现。
      """
-    rate, timestamp = fetch_exchange_rate()
-    if rate is not None:
+rate, timestamp = fetch_exchange_rate()
+if rate is not None:
         send_email(rate, timestamp)
 
 if __name__ == "__main__":
     # 初始化数据库
-    if not os.path.exists(DB_FILE):
+     if not os.path.exists(DB_FILE):
         fetch_exchange_rate()
 
     # 启动定时任务（每天12:00执行）
-    scheduler = BlockingScheduler()
-    scheduler.add_job(job, "cron", hour=12)
-    scheduler.start()
+scheduler = BlockingScheduler()
+scheduler.add_job(job, "cron", hour=12)
+scheduler.start()
